@@ -117,10 +117,37 @@ public:
 	 }
 	
 	void perderVidas() {
+		vidas --;
+	}
 	
+	void agregarPuntaje (int puntos) {
+		puntaje += puntos
+	}
 	
+	Int getVidas () const { return vidas; }
+	int getPuntaje () const { return puntaje; }
+		
+};
+
+//Hereda de Primal, tiene las 5 vidas iniciales y la puntuacion
+//con el "move" se usan las teclas WASD
+//el metodo disparar crea nuevas balas cuando se preciona la tecla 'espacio'
+
+Class Disparo : public Primal {
+public:
+	disparo (int xInicial, int yInicial) : Primal (xInicial, yIncial, 'l' , LIGHTCYAN) {}
+	
+	void move() override {
+		clear ();
+		y--;
+	}
 	
 };
+
+//Clase simple para los disparos
+//se mueve hacia arriba
+//usa el simbolo 'l' con color cyan
+
 
 int main {
 	
