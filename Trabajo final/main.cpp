@@ -194,9 +194,26 @@ public:
 //se cambia la direccion al llegar al borde bajando una linea
 //velocidad aleatora 1-2
 
+Class Meteorito : public Enemigos
+public:
+	Meteorito(int xInicial)
+		: Enemigos(xInicial, 1, '*', BROWN, 0, rand () % 2 + 1) {}
+	
+	void move () override {
+		clear();
+		y += velocidad;
+	}
+};
 
-
-
+//el meteorito se mueve en sentido vertica
+//no da puntos si se destruye, pero sí quita vida 
+//velocidad aleatoria 1-2
+	
+	
+	
+	
+	
+	
 //---¿NO HACE FALTA UN CIN.FAIL EN EL JUEGO? O NO HACE FALTA?
 
 int main {
