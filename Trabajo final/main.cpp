@@ -29,7 +29,7 @@
 #include <vector>
 #include <ctime>
 #include <windows.h>
-#include <string>
+#include <string> //NO SE SI LA TERMINO USANDO...
 #include <cstdlib>
 
 //----REVISAR MAYUSCULAS Y MINUSCULAS Y LA SINTAXIS QUE ESTO NO ES VISUAL STUDIO
@@ -101,7 +101,7 @@ public:
 			 case 'd' : if (x<78) x++; break;
 			 case 'w' : if (y>1) y--; break;
 			 case 's' : if (y<23) y++; break;
-//-----------------REVISAR por ahí los valores no queden bien,
+//-----------------REVISAR: por ahí los valores no queden bien,
 			 
 			 }
 		 }
@@ -176,12 +176,12 @@ public:
 	Nave(int xInicial, int yInicial, 'V', LIGHTRED, 10, rand() % 2 + 1) {
 		direccion = (xInicial <= 40) ? 1 : -1;
 	}
-	
+	//VER COMO QUEDAN ESTOS VALORES!
 	
 };
 
 
-
+//---¿NO HACE FALTA UN CIN.FAIL EN EL JUEGO? O NO HACE FALTA?
 
 int main {
 	
