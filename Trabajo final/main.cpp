@@ -32,7 +32,8 @@
 #include <string>
 #include <cstdlib>
 
-
+//----REVISAR MAYUSCULAS Y MINUSCULAS Y LA SINTAXIS QUE ESTO NO ES VISUAL STUDIO
+	
 using namespace std;
 
 //crear las clases que intervendrán en el juego
@@ -100,7 +101,7 @@ public:
 			 case 'd' : if (x<78) x++; break;
 			 case 'w' : if (y>1) y--; break;
 			 case 's' : if (y<23) y++; break;
-			 
+//-----------------REVISAR por ahí los valores no queden bien,
 			 
 			 }
 		 }
@@ -133,6 +134,10 @@ public:
 //con el "move" se usan las teclas WASD
 //el metodo disparar crea nuevas balas cuando se preciona la tecla 'espacio'
 
+
+//--------REVISAR: capaz la clase disparo puede ir despues....
+//--------REVISAR: si el color se escribia así
+
 Class Disparo : public Primal {
 public:
 	disparo (int xInicial, int yInicial) : Primal (xInicial, yIncial, 'l' , LIGHTCYAN) {}
@@ -163,6 +168,19 @@ public:
 //Clase base para todos los Enemigos
 //se agregan puntos al eliminar y velocidad
 //los enemigos se moverán diferente
+
+Class Nave : public Enemigos {
+private:
+	int direccion;
+public:
+	Nave(int xInicial, int yInicial, 'V', LIGHTRED, 10, rand() % 2 + 1) {
+		direccion = (xInicial <= 40) ? 1 : -1;
+	}
+	
+	
+};
+
+
 
 
 int main {
