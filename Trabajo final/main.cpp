@@ -39,7 +39,7 @@ using namespace std;
 //crear las clases que intervendrán en el juego
 
 
-Class Primal {
+class Primal {
 protected:
 	int x, y;
 	int color;
@@ -48,7 +48,7 @@ protected:
 	// los declaro así para que sean valores protegidos: posición, símbolo y color
 	
 public:
-	Primal (int xInicial, int yIncial) : x(xInicial), y(yIncial), symbol (simbolo), color (colour) {}
+	Primal (int xInicial, int yIncial) : x(xInicial), y(yIncial), symbol (sym), color (col) {}
 	
 	virtual void dibujar {
 	textcolor (color);
@@ -76,23 +76,23 @@ public:
 		
 	}
 	
-	virtual -Primal () {}
+	virtual ~Primal () {}
 	
 		
 };
 //Esta es la clase para todos los elementos del videojuego con los atributos progegidos, el constructor y algunos métodos
 //Se crea el Destructor para tener certeza que se destruyan las clases derivadas
 
-Class Jugador {
+class Jugador {
 private:
 	int vidas;
 	int puntaje;
 	
 public:
-	 Jugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A' GREEN), vidas (5), puntaje (0) {}
+	 Jugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A', GREEN), vidas (5), puntaje (0) {}
 	 
 	void move () override {
-		 if (kbhit (() {
+		 if (kbhit ()) {
 			 char tecla = getch ();
 			 clear ();
 			 
@@ -103,9 +103,10 @@ public:
 			 case 's' : if (y<23) y++; break;
 //-----------------REVISAR: por ahí los valores no queden bien,
 			 
-			 }
-		 }
-	 }
+			}
+		}
+	}
+	 
 	bool disparar (vector<Disparo*> & disparos) {
 		 if (kbhit()) {
 			 char tecla = getch();
@@ -138,7 +139,7 @@ public:
 //--------REVISAR: capaz la clase disparo puede ir despues....
 //--------REVISAR: si el color se escribia así
 
-Class Disparo : public Primal {
+class Disparo : public Primal {
 public:
 	disparo (int xInicial, int yInicial) : Primal (xInicial, yIncial, 'l' , LIGHTCYAN) {}
 	
@@ -153,13 +154,13 @@ public:
 //se mueve hacia arriba
 //usa el simbolo 'l' con color cyan
 
-Class Enemigos : public Primal {
+class Enemigos : public Primal {
 protected:
 	int puntos;
 	int velocidad;
 public:
-	Enemigos(int xInicial, int yInicial, char simbolo, int colour, int pts, int vel)
-		: Primal (int xInicial, int yInicial, simbolo, colour), puntos(pts), velocidad(vel) {}
+	Enemigos(int xInicial, int yInicial, char sym, int col, int pts, int vel)
+		: Primal (int xInicial, int yInicial, sym, col), puntos(pts), velocidad(vel) {}
 	
 	int getPuntos() const {return puntos; }
 	
@@ -169,7 +170,7 @@ public:
 //se agregan puntos al eliminar y velocidad
 //los enemigos se moverán diferente
 
-Class Nave : public Enemigos {
+class Nave : public Enemigos {
 private:
 	int direccion;
 public:
@@ -194,7 +195,7 @@ public:
 //se cambia la direccion al llegar al borde bajando una linea
 //velocidad aleatora 1-2
 
-Class Meteorito : public Enemigos
+class Meteorito : public Enemigos
 public:
 	Meteorito(int xInicial)
 		: Enemigos(xInicial, 1, '*', BROWN, 0, rand () % 2 + 1) {}
@@ -216,7 +217,7 @@ public:
 	
 //---¿NO HACE FALTA UN CIN.FAIL EN EL JUEGO? O NO HACE FALTA?
 
-int main {
+int main () {
 	
 	return 0;
 }
