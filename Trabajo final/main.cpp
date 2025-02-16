@@ -148,6 +148,22 @@ public:
 //se mueve hacia arriba
 //usa el simbolo 'l' con color cyan
 
+Class Enemigos : public Primal {
+protected:
+	int puntos;
+	int velocidad;
+public:
+	Enemigos(int xInicial, int yInicial, char simbolo, int colour, int pts, int vel)
+		: Primal (int xInicial, int yInicial, simbolo, colour), puntos(pts), velocidad(vel) {}
+	
+	int getPuntos() const {return puntos; }
+	
+};
+
+//Clase base para todos los Enemigos
+//se agregan puntos al eliminar y velocidad
+//los enemigos se moverán diferente
+
 
 int main {
 	
