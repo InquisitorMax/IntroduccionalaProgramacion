@@ -35,7 +35,7 @@
 
 using namespace std;
 
-//crear las clases para que intervendrán en el juego
+//crear las clases que intervendrán en el juego
 
 
 Class Primal {
@@ -47,9 +47,9 @@ protected:
 	// los declaro así para que sean valores protegidos: posición, símbolo y color
 	
 public:
-	Primal (int xInicial, int yIncianl) : x(xInicial), y(yIncianl), symbol (simbolo), color (colour) {}
+	Primal (int xInicial, int yIncial) : x(xInicial), y(yIncial), symbol (simbolo), color (colour) {}
 	
-	virtual void draw {
+	virtual void dibujar {
 	textcolor (color);
 	gotoxy (x,y);
 	
@@ -68,15 +68,59 @@ public:
 	int getX () const { return x; }
 	int getY () const { return y; }
 	
-	virtual void move () = 
+	virtual void move () = 0;
 	
+	bool chocar (const Primal& otra) const {
+		return x == otra.x && y == otra.y;
+		
+	}
 	
+	virtual -Primal () {}
+	
+		
+};
+//Esta es la clase para todos los elementos del videojuego con los atributos progegidos, el constructor y algunos métodos
+//Se crea el Destructor para tener certeza que se destruyan las clases derivadas
+
+Class Jugador {
+private:
+	int vidas;
+	int puntaje;
+	
+public:
+	 Jugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A' GREEN), vidas (5), puntaje (0) {}
+	 
+	void move () override {
+		 if (kbhit (() {
+			 char tecla = getch ();
+			 clear ();
+			 
+			 switch (tecla) {
+			 case 'a' : if (x>1) x--; break;
+			 case 'd' : if (x<78) x++; break;
+			 case 'w' : if (y>1) y--; break;
+			 case 's' : if (y<23) y++; break;
+			 
+			 
+			 }
+		 }
+	 }
+	bool disparar (vector<Disparo*> & disparos) {
+		 if (kbhit()) {
+			 char tecla = getch();
+			 if (tecla == ' ') {
+				 disparos.push_back (new Disparo(x, y-1));
+				 return true;
+			 }
+		 }
+		 return false;
+	 }
+	
+	void perderVidas() {
 	
 	
 	
 };
-
-
 
 int main {
 	
