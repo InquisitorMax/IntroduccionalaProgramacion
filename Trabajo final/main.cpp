@@ -83,13 +83,13 @@ public:
 //Esta es la clase para todos los elementos del videojuego con los atributos progegidos, el constructor y algunos métodos
 //Se crea el Destructor para tener certeza que se destruyan las clases derivadas
 
-class Jugador {
+class NaveJugador {
 private:
 	int vidas;
 	int puntaje;
 	
 public:
-	 Jugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A', GREEN), vidas (5), puntaje (0) {}
+	 NaveJugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A', GREEN), vidas (5), puntaje (0) {}
 	 
 	void move () override {
 		 if (kbhit ()) {
@@ -126,7 +126,7 @@ public:
 		puntaje += puntos
 	}
 	
-	Int getVidas () const { return vidas; }
+	int getVidas () const { return vidas; }
 	int getPuntaje () const { return puntaje; }
 		
 };
@@ -154,12 +154,12 @@ public:
 //se mueve hacia arriba
 //usa el simbolo 'l' con color cyan
 
-class Enemigos : public Primal {
+class Enemigo : public Primal {
 protected:
 	int puntos;
 	int velocidad;
 public:
-	Enemigos(int xInicial, int yInicial, char sym, int col, int pts, int vel)
+	Enemigo(int xInicial, int yInicial, char sym, int col, int pts, int vel)
 		: Primal (int xInicial, int yInicial, sym, col), puntos(pts), velocidad(vel) {}
 	
 	int getPuntos() const {return puntos; }
@@ -170,7 +170,7 @@ public:
 //se agregan puntos al eliminar y velocidad
 //los enemigos se moverán diferente
 
-class Nave : public Enemigos {
+class NaveJugador : public Enemigo {
 private:
 	int direccion;
 public:
@@ -195,10 +195,10 @@ public:
 //se cambia la direccion al llegar al borde bajando una linea
 //velocidad aleatora 1-2
 
-class Meteorito : public Enemigos
+class Meteorito : public Enemigo
 public:
 	Meteorito(int xInicial)
-		: Enemigos(xInicial, 1, '*', BROWN, 0, rand () % 2 + 1) {}
+		: Enemigo(xInicial, 1, '*', BROWN, 0, rand () % 2 + 1) {}
 	
 	void move () override {
 		clear();
@@ -210,11 +210,64 @@ public:
 //no da puntos si se destruye, pero sí quita vida 
 //velocidad aleatoria 1-2
 	
+class Madre
+private:
+	NaveJugador* jugador;
+	vector<Enemigo*> enemigos;
+	vector<Disparo*> disparos;
+	vector<string> mensaje;
 	
+	bool gameOver;
+	int frameCount;
 	
+public:
+	Madre () : gameOver(false), frameCount(0) {
+		srand(time(nullptr));
+		jugador = new NaveJugador (40, 20);
+		mensaje.push_back ("Defendamos la galaxia! Vamos, Miguel!");
+		
+	}
 	
+	~Madre () {
+		
+		delete jugador;
+		for (auto disparo : disparos) delete disparo;
+		for (auto enemigo : enemigos) delete enemigo;
+		
+	}
 	
-	
+	void run () {
+		
+	}
+};
+// acá armo la clase principal que gestiona
+//controla mensajes, cuenta frames, estado de juego, puntero a los objetos
+//el metodo run contiene el bucle principal
+//el constructor inicializa el juego y el destructor libera memoria
+
+void dibujarBorde () {
+	textcolor (WHITE);
+	for (int i=0 , i < 70, i++) {
+		gotoxy (i, 0);
+		cout << "#";
+		gotoxy (i, 24);
+		cout << "#";
+	}
+}
+//dibujo el borde del mapa con el simbolo #
+
+void mostrarStatus() {
+	textcolor (LIGHTGRAY);
+	gotoxy (2, 25);
+	cout << "Vidas: " << jugador -> getVidas() " Puntaje: " << jugador -> getPuntos();
+	gotoxy(50, 25);
+	cout << "CONTROLES : A, D, W, S y BARRA ESPACIADORA ";
+}
+//se muestra en pantalla las vidas, los puntos y las teclas de controles
+
+
+
+
 //---¿NO HACE FALTA UN CIN.FAIL EN EL JUEGO? O NO HACE FALTA?
 
 int main () {
