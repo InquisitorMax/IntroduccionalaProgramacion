@@ -100,11 +100,11 @@ public:
 			clear ();
 			
 			switch (tecla) {
-			case 'a' : if (x>1) x--; break;
-			case 'd' : if (x<78) x++; break;
-			case 'w' : if (y>1) y--; break;
-			case 's' : if (y<23) y++; break;
-			//-----------------REVISAR: por ahí los valores no queden bien,
+				case 'a' : if (x>1) x--; break;
+				case 'd' : if (x<78) x++; break;
+				case 'w' : if (y>1) y--; break;
+				case 's' : if (y<23) y++; break;
+				//-----------------REVISAR: por ahí los valores no queden bien,
 			
 			}
 		}
@@ -208,21 +208,21 @@ public:
 		y += velocidad;
 	}
 };
-
-//el meteorito se mueve en sentido vertica
-//no da puntos si se destruye, pero sí quita vida 
-//velocidad aleatoria 1-2
-
+	
+	//el meteorito se mueve en sentido vertica
+	//no da puntos si se destruye, pero sí quita vida 
+	//velocidad aleatoria 1-2
+	
 class Madre {
 private:
-	NaveJugador* jugador;
-	vector<Enemigo*> enemigos;
-	vector<Disparo*> disparos;
-	vector<string> mensajes;
-	
-	bool gameOver;
-	int frameCount;
-	
+		NaveJugador* jugador;
+		vector<Enemigo*> enemigos;
+		vector<Disparo*> disparos;
+		vector<string> mensajes;
+		
+		bool gameOver;
+		int frameCount;
+		
 public:
 	Madre () : gameOver(false), frameCount(0) {
 		srand(time(nullptr));
@@ -313,30 +313,30 @@ void colisionesEnemigos() {
 				NaveEnemiga* nave = dynamic_cast<NaveEnemiga*>(enemigoIt);
 				if (nave) {
 					jugador->agregarPuntaje(nave->getPuntos));
-			
-			//mensaje aleatorio
-			string msjs[] = {"¡Buen Tiro!", "Excelenteee", "¡Lo hiciste!", "¡Fabulosoo!"};
-			agregarMensaje(msjs[rand() %4] + " +" + to_sting(nave->getPuntos()) + " puntos");
+					
+					//mensaje aleatorio
+					string msjs[] = {"¡Buen Tiro!", "Excelenteee", "¡Lo hiciste!", "¡Fabulosoo!"};
+					agregarMensaje(msjs[rand() %4] + " +" + to_sting(nave->getPuntos()) + " puntos");
 				}
-				
+			
 				(*disparoIt)->clear();
 				(*enemigoIt->clear();
-				
+			
 				delete *disparoIt;
 				delete *enemigoIt;
-				
+			
 				disparoIt = disparos.erase(disparoIt);
 				enemigoIt = enemigos.erase(enemigoIt);
-				
+			
 				disparoRemoved = true;
 				break;
-				
-				
+			
+		
 			}else {
 				++enemigoIt;
 			}
 		}
-		
+	
 		if (!disparoRemoved) {
 			++disparoIt;
 		}
