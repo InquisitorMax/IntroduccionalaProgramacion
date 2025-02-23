@@ -230,6 +230,7 @@ private:
 	void agregarMensaje(const string& msj);
 	void spawnEnemigos();
 	void colisionesEnemigos();
+	void limpiarObjetos();
 	
 public:
 	Madre () : gameOver(false), frameCount(0) {
@@ -382,6 +383,27 @@ void Madre::colisionesEnemigos() {
 
 //Entre los disparos y los enemigos: suma puntos y muestra mensaje
 //Entre la nave y los meteoritos: se pierde vida y efecto de titilacion
+
+void Madre::limpiarObjetos () {
+	for (auto it = disparos.begin(); it != disparos.end();) {
+		if ((*it) ->getY() <=0) {
+			(*it)->clear();
+			delete *it;
+			it = disparos.erase(it);
+		}else {
+			++it;
+		}
+	}
+	for (auto it = enemigos.begin(); it != enemigos.end();) {
+		if ((*it) ->getY() >= 24) {
+			(*it)->clear();
+			delete *it;
+			it = enemigos.erase(it);
+		}else {
+			++it;
+		}
+	}
+}
 
 void Madre::run() {
 	clrscr();
