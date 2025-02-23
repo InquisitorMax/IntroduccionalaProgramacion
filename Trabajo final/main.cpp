@@ -29,7 +29,7 @@ El borde*/
 #include <vector>
 #include <ctime>
 #include <windows.h>
-#include <string> //NO SE SI LA TERMINO USANDO...
+#include <string> 
 #include <cstdlib>
 
 //----REVISAR MAYUSCULAS Y MINUSCULAS Y LA SINTAXIS QUE ESTO NO ES VISUAL STUDIO
@@ -57,7 +57,7 @@ public:
 		
 		cout << symbol;
 		
-	};
+	}
 	
 	virtual void clear () {
 		gotoxy (x, y);
@@ -65,7 +65,7 @@ public:
 		cout << " ";
 		
 		
-	};
+	}
 	
 	int getX () const { return x; }
 	int getY () const { return y; }
@@ -86,7 +86,22 @@ public:
 //Esta es la clase para todos los elementos del videojuego con los atributos progegidos, el constructor y algunos métodos
 //Se crea el Destructor para tener certeza que se destruyan las clases derivadas
 
-class NaveJugador {
+class Disparo : public Primal {
+public:
+	Disparo (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'l' , LIGHTCYAN) {}
+	
+	void move() override {
+		clear ();
+		y--;
+	}
+	
+};
+
+//Clase simple para los disparos
+//se mueve hacia arriba
+//usa el simbolo 'l' con color cyan
+
+class NaveJugador : public Primal {
 private:
 	int vidas;
 	int puntaje;
@@ -142,20 +157,7 @@ public:
 //--------REVISAR: capaz la clase disparo puede ir despues....
 //--------REVISAR: si el color se escribia así
 
-class Disparo : public Primal {
-public:
-	Disparo (int xInicial, int yInicial) : Primal (xInicial, yIncial, 'l' , LIGHTCYAN) {}
-	
-	void move() override {
-		clear ();
-		y--;
-	}
-	
-};
 
-//Clase simple para los disparos
-//se mueve hacia arriba
-//usa el simbolo 'l' con color cyan
 
 class Enemigo : public Primal {
 protected:
@@ -177,7 +179,8 @@ class NaveEnemiga : public Enemigo {
 private:
 	int direccion;
 public:
-	NaveEnemiga(int xInicial, int yInicial, 'V', LIGHTRED, 10, rand() % 2 + 1) {
+	NaveEnemiga(int xInicial, int yInicial)
+		: Enemigo(xInicial, yInicial, 'V', LIGHTRED, 10, rand() % 2 + 1) {
 		direccion = (xInicial <= 40) ? 1 : -1;
 	}
 	//VER COMO QUEDAN ESTOS VALORES!
@@ -187,7 +190,7 @@ public:
 		x += direccion * velocidad;
 		
 		if (x <=1 || x >= 78) {
-			direccion *= -1:
+			direccion *= -1;
 				y++;
 		}
 	}
@@ -223,11 +226,18 @@ private:
 	bool gameOver;
 	int frameCount;
 	
+	void dibujarBorde();
+	void mostrarStatus();
+	void mostrarMensajes();
+	void agregarMensaje(const string& msj);
+	void spawnEnemigos();
+	void colisionesEnemigos();
+	
 public:
 	Madre () : gameOver(false), frameCount(0) {
 		srand(time(nullptr));
 		jugador = new NaveJugador (40, 20);
-		mensaje.push_back ("Defendamos la galaxia! Vamos, Miguel!");
+		mensajes.push_back ("Defendamos la galaxia! Vamos, Miguel!");
 		
 	}
 	
@@ -265,7 +275,7 @@ void dibujarBorde() {
 }
 //dibujo el borde del mapa con el simbolo #
 
-void mostrarStatus() {
+void Madre::mostrarStatus() {
 	textcolor (LIGHTGRAY);
 	gotoxy (2, 25);
 	cout << "Vidas: " << jugador -> getVidas() " Puntaje: " << jugador -> getPuntaje();
@@ -309,10 +319,10 @@ void colisionesEnemigos() {
 		bool disparoRemoved = false;
 		
 		for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end();) {
-			if ((disparoIt -> chochar (**enemigoIt)) {
+			if ((*disparoIt -> chochar (**enemigoIt)) {
 				NaveEnemiga* nave = dynamic_cast<NaveEnemiga*>(enemigoIt);
 				if (nave) {
-					jugador->agregarPuntaje(nave->getPuntos));
+					jugador->agregarPuntaje(nave->getPuntos());
 			
 			//mensaje aleatorio
 			string msjs[] = {"¡Buen Tiro!", "Excelenteee", "¡Lo hiciste!", "¡Fabulosoo!"};
@@ -320,7 +330,7 @@ void colisionesEnemigos() {
 				}
 				
 				(*disparoIt)->clear();
-				(*enemigoIt->clear();
+				(*enemigoIt)->clear();
 				
 				delete *disparoIt;
 				delete *enemigoIt;
@@ -342,7 +352,7 @@ void colisionesEnemigos() {
 		}
 	}
 	//colisiones entre la nave y los enemigos
-	for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end(),) {
+	for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end();) {
 		Meteorito* meteorito = dynamic_cast<Meteorito*>(enemigoIt);
 		if (meteorito && meteorito->chocar(*jugador)) {
 			jugador->perderVidas();
@@ -355,7 +365,7 @@ void colisionesEnemigos() {
 				Sleep(100);
 			}
 			
-			agregarMensaje("Te dieron... Perdés una vida. Te quedan: " + to_sting(jugador->getVidas()));
+			agregarMensaje("Te dieron... Perdés una vida. Te quedan: " + to_string(jugador->getVidas()));
 			meteorito->clear();
 			delete meteorito;
 			enemigoIt = enemigos.erase(enemigoIt);
@@ -398,7 +408,7 @@ void run() {
 		for (auto disparo : disparos) disparo->dibujar();
 		for (auto enemigo : enemigos) enemigo->dibujar();
 		
-		motrarStatus();
+		mostrarStatus();
 		mostrarMensajes();
 		
 		Sleep(50);
@@ -409,7 +419,7 @@ void run() {
 	cout << "Juego Terminado";
 	gotoxy (30, 12);
 	cout << "Tu puntuación final es: " << jugador->getPuntaje();
-	gotoxy (25. 14);
+	gotoxy (25, 14);
 	cout << "Para salir presiona una tecla cualquiera, como Homero...";
 	
 	getch();
