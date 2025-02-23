@@ -49,7 +49,7 @@ protected:
 	// los declaro así para que sean valores protegidos: posición, símbolo y color
 	
 public:
-	Primal (int xInicial, int yIncial, char sym, int col) : x(xInicial), y(yIncial), symbol (sym), color (col) {}
+	Primal (int xInicial, int yInicial, char sym, int col) : x(xInicial), y(yInicial),symbol (sym), color (col) {}
 	
 	virtual void dibujar () {
 		textcolor (color);
@@ -122,6 +122,7 @@ public:
 			//-----------------REVISAR: por ahí los valores no queden bien,
 			
 			}
+			dibujar();
 		}
 	}
 	
@@ -165,7 +166,7 @@ protected:
 	int velocidad;
 public:
 	Enemigo(int xInicial, int yInicial, char sym, int col, int pts, int vel)
-		: Primal (int xInicial, int yInicial, sym, col), puntos(pts), velocidad(vel) {}
+		: Primal (xInicial, yInicial, sym, col), puntos(pts), velocidad(vel) {}
 	
 	int getPuntos() const {return puntos; }
 	
@@ -193,6 +194,7 @@ public:
 			direccion *= -1;
 				y++;
 		}
+		dibujar();
 	}
 };
 
@@ -209,6 +211,7 @@ public:
 	void move () override {
 		clear();
 		y += velocidad;
+		dibujar();
 	}
 };
 
@@ -249,10 +252,11 @@ public:
 		
 	}
 	
-	void run () {
-		
-	}
+	void run (); 
 };
+
+	
+
 // acá armo la clase principal que gestiona
 //controla mensajes, cuenta frames, estado de juego, puntero a los objetos
 //el metodo run contiene el bucle principal
@@ -278,7 +282,7 @@ void dibujarBorde() {
 void Madre::mostrarStatus() {
 	textcolor (LIGHTGRAY);
 	gotoxy (2, 25);
-	cout << "Vidas: " << jugador -> getVidas() " Puntaje: " << jugador -> getPuntaje();
+	cout << "Vidas: " << jugador -> getVidas(); " Puntaje: " << jugador -> getPuntaje();
 	gotoxy(50, 25);
 	cout << "CONTROLES : A, D, W, S y BARRA ESPACIADORA ";
 }
@@ -384,7 +388,7 @@ void colisionesEnemigos() {
 //Entre los disparos y los enemigos: suma puntos y muestra mensaje
 //Entre la nave y los meteoritos: se pierde vida y efecto de titilacion
 
-void run() {
+void Madre::run() {
 	clrscr();
 	_setcursortype(_NOCURSOR);
 	
