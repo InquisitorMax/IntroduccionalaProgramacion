@@ -25,20 +25,18 @@ Indicador de teclas para jugar
 El borde*/
 
 #include <iostream>
-#include <conio2.h>
-#include <vector>
-#include <ctime>
-#include <windows.h>
-#include <string> 
-#include <cstdlib>
+#include <conio2.h> //esta biblioteca es para la pantalla y colores
+#include <vector> //esta biblioteca es para las listas dinamicas
+#include <ctime> //esta biblioteca es para el tiempo y generar numeros
+#include <windows.h> //esta biblioteca es para funciones del Windows como Sleep, por ejemplo
+#include <string> //esto es para usar la clase string
+#include <cstdlib> //esto es para usar funciones como rand
 
-//----REVISAR MAYUSCULAS Y MINUSCULAS Y LA SINTAXIS QUE ESTO NO ES VISUAL STUDIO
+
 
 using namespace std;
 
-//crear las clases que intervendrán en el juego
-
-//capaz tengo que hacer el "terreno" primero....
+//creo la clase base para todos los objetos del juego
 
 class Primal {
 protected:
@@ -46,7 +44,7 @@ protected:
 	int color;
 	char symbol;
 	
-	// los declaro así para que sean valores protegidos: posición, símbolo y color
+	// los declaro así para que sean valores protegidos: posición en el mapa, símbolo y color
 	
 public:
 	Primal (int xInicial, int yInicial, char sym, int col) : x(xInicial), y(yInicial),symbol (sym), color (col) {}
@@ -55,22 +53,29 @@ public:
 		textcolor (color);
 		gotoxy (x,y);
 		
-		cout << symbol;
+		putch(symbol);
 		
 	}
+	//dibuja el objeto en su posicion
 	
 	virtual void clear () {
+		textbackground(BLACK);
 		gotoxy (x, y);
 		
-		cout << " ";
+		putch(' ');
 		
 		
 	}
+	//el clear borra el objeto
 	
 	int getX () const { return x; }
 	int getY () const { return y; }
 	
+	//metodo de movimiento que usaran las clases derivadas
+	
 	virtual void move () = 0;
+	
+	//verifica si el objeto choca con algo 
 	
 	bool chocar (const Primal& otra) const {
 		return x == otra.x && y == otra.y;
@@ -78,21 +83,29 @@ public:
 	}
 	
 	virtual ~Primal () {}
-	
+	////Se crea el Destructor para tener certeza que se destruyan las clases derivadas
 	
 };
 
 
-//Esta es la clase para todos los elementos del videojuego con los atributos progegidos, el constructor y algunos métodos
-//Se crea el Destructor para tener certeza que se destruyan las clases derivadas
+
+
 
 class Disparo : public Primal {
+private:
+	int velocidad;
+	//velocidad de los disparos
+	
 public:
-	Disparo (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'l' , LIGHTCYAN) {}
+	Disparo (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'l' , LIGHTCYAN), velocidad(2) {}
+	
 	
 	void move() override {
 		clear ();
 		y--;
+		if (y>0) {
+			dibujar();
+		}
 	}
 	
 };
@@ -105,9 +118,12 @@ class NaveJugador : public Primal {
 private:
 	int vidas;
 	int puntaje;
+	int cooldownDisparo;
+	
+
 	
 public:
-	NaveJugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A', GREEN), vidas (5), puntaje (0) {}
+	NaveJugador (int xInicial, int yInicial) : Primal (xInicial, yInicial, 'A', GREEN), vidas (5), puntaje (0), cooldownDisparo(0) {}
 	
 	void move() override {
 		if (kbhit ()) {
@@ -119,23 +135,33 @@ public:
 			case 'd' : if (x<78) x++; break;
 			case 'w' : if (y>1) y--; break;
 			case 's' : if (y<23) y++; break;
-			//-----------------REVISAR: por ahí los valores no queden bien,
+			case ' ' : 
+				if (cooldownDisparo == 0) {
+					cooldownDisparo = 5;
+				}
+				break;
 			
 			}
-			dibujar();
+			
 		}
+		if (cooldownDisparo>0) {
+			cooldownDisparo--;
+			
+		}
+		dibujar();
+		
 	}
 	
 	bool disparar (vector <Disparo*> & disparos) {
-		if (kbhit()) {
-			char tecla = getch();
-			if (tecla == ' ') {
-				disparos.push_back (new Disparo(x, y-1));
-				return true;
-			}
+		if (cooldownDisparo == 4) {
+			disparos.push_back(new Disparo(x, y-1));
+			
+			return true;
 		}
+		//hace que dispare desde la nave
 		return false;
 	}
+	//hace un nuevo disparo si está listo
 	
 	void perderVidas() { vidas--; }
 	void agregarPuntaje (int puntos) { puntaje += puntos; }
@@ -144,14 +170,11 @@ public:
 	int getPuntaje() const { return puntaje; }
 	
 };
+/*Hereda de Primal, tiene las 5 vidas iniciales y la puntuacion
+con el "move" se usan las teclas WASD
+el metodo disparar crea nuevas balas cuando se preciona la tecla 'espacio'*/
 
-//Hereda de Primal, tiene las 5 vidas iniciales y la puntuacion
-//con el "move" se usan las teclas WASD
-//el metodo disparar crea nuevas balas cuando se preciona la tecla 'espacio'
 
-
-//--------REVISAR: capaz la clase disparo puede ir despues....
-//--------REVISAR: si el color se escribia así
 
 
 
@@ -179,7 +202,7 @@ public:
 		: Enemigo(xInicial, yInicial, 'V', LIGHTRED, 10, rand() % 2 + 1) {
 		direccion = (xInicial <= 40) ? 1 : -1;
 	}
-	//VER COMO QUEDAN ESTOS VALORES!
+	
 	
 	void move () override {
 		clear();
@@ -196,7 +219,7 @@ public:
 //la nave enemiga se mueve en sentido horizontal
 //da 10 puntos al ser eliminada
 //se cambia la direccion al llegar al borde bajando una linea
-//velocidad aleatora 1-2
+
 
 class Meteorito : public Enemigo {
 public:
@@ -210,9 +233,9 @@ public:
 	}
 };
 
-//el meteorito se mueve en sentido vertica
+//el meteorito se mueve en sentido vertical
 //no da puntos si se destruye, pero sí quita vida 
-//velocidad aleatoria 1-2
+
 
 class Madre {
 private:
@@ -223,13 +246,178 @@ private:
 	
 	bool gameOver;
 	int frameCount;
+//clase Madre para gestionar el juego
+//string para los mensajes en pantalla
+//el bool es para el estado del juego
+//frameCount cuenta los frames para controlar el tiempo
 	
-	void dibujarBorde();
-	void mostrarStatus();
-	void mostrarMensajes();
-	void agregarMensaje(const string& msj);
-	void spawnEnemigos();
-	void colisionesEnemigos();
+	void spawnEnemigos() {
+		if (frameCount % 30 == 0) {
+			int x = rand() % 75 + 2;
+			enemigos.push_back(new NaveEnemiga(x, 2));
+		}
+		if (frameCount % 20 == 0 && enemigos.size() <15) {
+			int x = rand() % 75 + 2;
+			enemigos.push_back(new Meteorito(x));
+		}
+	}
+//esto fabrica enemigos periodicamente tanto naves enemigas como meteoritos
+	
+	void colisionesEnemigos() {
+		for (auto disparoIt = disparos.begin(); disparoIt != disparos.end();) {
+			bool disparoRemoved = false;
+			
+			for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end();) {
+				if ((*disparoIt)->chocar(**enemigoIt)) {
+					NaveEnemiga* nave = dynamic_cast<NaveEnemiga*>(*enemigoIt);
+					if (nave) {
+						jugador->agregarPuntaje(nave->getPuntos());
+						
+						string msjs[] = {"¡Buen Tiro!", "Excelenteee", "¡Lo hiciste!", "¡Fabulosoo!"};
+						agregarMensaje(msjs[rand() % 4] + " +" + to_string(nave->getPuntos()) + " puntos");
+					}
+					
+					(*disparoIt)->clear();
+					(*enemigoIt)->clear();
+					
+					delete *disparoIt;
+					delete *enemigoIt;
+					
+					disparoIt = disparos.erase(disparoIt);
+					enemigoIt = enemigos.erase(enemigoIt);
+					
+					disparoRemoved = true;
+					
+					break;
+					
+				}else {
+					
+					++enemigoIt;
+				}
+			}
+			
+			if (!disparoRemoved) {
+				++disparoIt;
+				
+			}
+		}
+	//esto detecta los choques entre los disparos que hacemos y los enemigos
+		
+		for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end();) {
+			if ((*enemigoIt)->chocar(*jugador)) {
+				jugador->perderVidas();
+				
+				for (int i=0; i<3; i++) {
+					jugador->clear();
+					Sleep(50);
+					jugador->dibujar();
+					Sleep(50);
+				}
+				
+				if (dynamic_cast<Meteorito*>(*enemigoIt)) {
+					agregarMensaje("¡Te golpeó un meteorito! Perdés una vida. Te quedan: " + to_string(jugador->getVidas()));
+				
+				} else {
+					agregarMensaje("¡Colisión con nave enemiga! Perdés una vida. Te queda: " + to_string(jugador->getVidas()));
+				}
+				
+				(*enemigoIt)->clear();
+				delete *enemigoIt;
+				enemigoIt = enemigos.erase(enemigoIt);
+				
+				if (jugador->getVidas() <=0) {
+					gameOver = true;
+					
+				}
+			}else {
+				++enemigoIt;
+			}
+		}
+	}
+	//esto detecta los choques entre nuestra nave y las naves enemigas
+	
+	void limpiarObjetos() {
+		
+		for (auto it = disparos.begin(); it != disparos.end();) {
+			if ((*it)->getY() <=0) {
+				(*it)->clear();
+				delete *it;
+				it = disparos.erase(it);
+			}else {
+				++it;
+			}
+		}
+		
+		for (auto it = enemigos.begin(); it != enemigos.end();) {
+			if ((*it)->getY() >=24) {
+				(*it)->clear();
+				delete *it;
+				it = enemigos.erase(it);
+			}else {
+				++it;
+			}
+		}
+	}	
+	//esto va borrando los disparos fuera de la pantalla
+	
+	void  dibujarBorde() {
+		textbackground(BLACK);
+		textcolor(WHITE);
+		
+		for (int i=0; i<=79; i++) {
+			gotoxy (i, 0);
+			putch ('#');
+			gotoxy (i, 24);
+			putch ('#');
+		}
+		
+		for (int i=1; i<=23; i++) {
+			gotoxy (0, i);
+			putch ('#');
+			gotoxy (79, i);
+			putch ('#');
+		}
+		
+		for (int i=25; i<=28; i++) {
+			gotoxy (1, i);
+			clreol();
+		}
+	}
+	//esto es para dibujar los bordes de la pantalla
+	//el ultimo for es para borrar los mensajes de la parte inferior para que no se apilen
+	
+	void mostrarStatus() {
+		textbackground(BLACK);
+		textcolor(LIGHTGRAY);
+		
+		gotoxy (1, 25);
+		cout << "Vidas: " << jugador->getVidas() << " | Puntaje: " << jugador->getPuntaje();
+		gotoxy (45, 25);
+		cout << "CONTROLES : A, D, W, S y BARRA ESPACIADORA ";
+	}
+//esto es para mostrar las vidas y el puntaje que llevamos
+	
+	void mostrarMensajes() {
+		textbackground(BLACK);
+		textcolor(YELLOW);
+		int y = 26;
+		
+		for (size_t i=0; i <mensajes.size() && i<3; i++) {
+			gotoxy (2, y+i);
+			clreol();
+			cout << mensajes[i];
+		}
+	}
+//con esto se muestras los ultimos 3 mensajes 
+	
+	void agregarMensaje(const string & msj) {
+		mensajes.insert(mensajes.begin(), msj);
+		if (mensajes.size() >3) {
+			mensajes.pop_back();
+		}
+	}
+//agrega un mensaje pero mantiene lo de los 3 ultimos
+	
 	
 public:
 	Madre () : gameOver(false), frameCount(0) {
@@ -237,6 +425,48 @@ public:
 		jugador = new NaveJugador (40, 20);
 		mensajes.push_back ("Defendamos la galaxia! Vamos, Miguel!");
 		
+		clrscr();
+		textbackground(BLACK);
+		_setcursortype(_NOCURSOR);
+	}
+	
+	void run() {
+		dibujarBorde();
+		mostrarStatus();
+		jugador->dibujar();
+		
+		while (!gameOver) {
+			frameCount++;
+			
+			for (auto disparo : disparos) disparo->move();
+			for (auto enemigo : enemigos) enemigo->move();
+			
+			jugador->move();
+			jugador->disparar(disparos);
+			
+			spawnEnemigos();
+			colisionesEnemigos();
+			limpiarObjetos();
+			
+			mostrarStatus();
+			mostrarMensajes();
+			
+			Sleep(30);
+			
+		}
+		
+		clrscr();
+		textbackground(BLACK);
+		gotoxy (30, 10);
+		cout << "Juego Terminado";
+		gotoxy (30, 12);
+		cout << "Tu puntuación final es: " << jugador->getPuntaje();
+		gotoxy (25, 14);
+		cout << "Para salir presiona una tecla cualquiera, como Homero...";
+		
+		getch();
+		
+				
 	}
 	
 	~Madre () {
@@ -247,7 +477,7 @@ public:
 		
 	}
 	
-	void run (); 
+	
 };
 
 	
@@ -256,180 +486,11 @@ public:
 //controla mensajes, cuenta frames, estado de juego, puntero a los objetos
 //el metodo run contiene el bucle principal
 //el constructor inicializa el juego y el destructor libera memoria
-
-void Madre::dibujarBorde() {
-	textcolor (WHITE);
-	for (int i=0; i < 70; i++) {
-		gotoxy (i, 0);
-		cout << "#";
-		gotoxy (i, 24);
-		cout << "#";
-	}
-	for (int i=0; i<25; i++){
-		gotoxy (0, i);
-		cout <<"#";
-		gotoxy (79, i);
-		cout << "#";
-	}
-}
-//dibujo el borde del mapa con el simbolo #
-
-void Madre::mostrarStatus() {
-	textcolor (LIGHTGRAY);
-	gotoxy (2, 25);
-	cout << "Vidas: " << jugador -> getVidas() <<" Puntaje: " << jugador -> getPuntaje();
-	gotoxy(50, 25);
-	cout << "CONTROLES : A, D, W, S y BARRA ESPACIADORA ";
-}
-//se muestra en pantalla las vidas, los puntos y las teclas de controles
-
-void Madre::mostrarMensajes() {
-	int y = 26;
-	for (size_t i=0; i < mensajes.size() && i <3; i++){
-		gotoxy (2, y + i);
-		cout << " ";
-		gotoxy (2, y + i);
-		cout << mensajes[i];
-	}
-}
-
-void Madre::agregarMensaje (const string& msj) {
-	mensajes.insert(mensajes.begin(),msj);
-	if (mensajes.size() >3) {
-		mensajes.pop_back();
-	}
-}
-//Es para los mensajes que aparecen en pantalla, como "Buen tiro"
-
-void Madre::spawnEnemigos() {
-	if (frameCount % 30 == 0) {
-		int x = rand() % 75 + 2;
-		enemigos.push_back (new NaveEnemiga(x,2));
-	}
-	if (frameCount % 20 == 0) {
-		int x = rand() % 75 + 2;
-		enemigos.push_back (new Meteorito(x));
-	}
-}
-//Hace nuevos enemigos cada 30 frames para naves, cada 20 frames para meteoritos
-
-void Madre::colisionesEnemigos() {
-	for (auto disparoIt = disparos.begin(); disparoIt != disparos.end();) {
-		bool disparoRemoved = false;
-		
-		for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end();) {
-			if ((*disparoIt)-> chocar (**enemigoIt)) {
-				NaveEnemiga* nave = dynamic_cast<NaveEnemiga*>(*enemigoIt);
-				if (nave) {
-					jugador->agregarPuntaje(nave->getPuntos());
-			
-			//mensaje aleatorio
-			string msjs[] = {"¡Buen Tiro!", "Excelenteee", "¡Lo hiciste!", "¡Fabulosoo!"};
-			agregarMensaje(msjs[rand() %4] + " +" + to_string(nave->getPuntos()) + " puntos");
-				}
-				
-				(*disparoIt)->clear();
-				(*enemigoIt)->clear();
-				
-				delete *disparoIt;
-				delete *enemigoIt;
-				
-				disparoIt = disparos.erase(disparoIt);
-				enemigoIt = enemigos.erase(enemigoIt);
-				
-				disparoRemoved = true;
-				break;
-				
-				
-			}else {
-				++enemigoIt;
-			}
-		}
-		
-		if (!disparoRemoved) {
-			++disparoIt;
-		}
-	}
-	//colisiones entre la nave y los enemigos
-	for (auto enemigoIt = enemigos.begin(); enemigoIt != enemigos.end();) {
-		Meteorito* meteorito = dynamic_cast<Meteorito*>(*enemigoIt);
-		if (meteorito && meteorito->chocar(*jugador)) {
-			jugador->perderVidas();
-			
-			//para la titilacion
-			for (int i=0; i<3; i++) {
-				jugador->clear();
-				Sleep(100);
-				jugador->dibujar();
-				Sleep(100);
-			}
-			
-			agregarMensaje("Te dieron... Perdés una vida. Te quedan: " + to_string(jugador->getVidas()));
-			meteorito->clear();
-			delete meteorito;
-			enemigoIt = enemigos.erase(enemigoIt);
-			
-			if (jugador->getVidas() <=0) {
-				gameOver = true;
-			}
-		}else {
-			++enemigoIt;
-		}
-		
-	}
-	
-}
-
-//Entre los disparos y los enemigos: suma puntos y muestra mensaje
-//Entre la nave y los meteoritos: se pierde vida y efecto de titilacion
-
-void Madre::run() {
-	clrscr();
-	_setcursortype(_NOCURSOR);
-	
-	dibujarBorde();
-	mostrarStatus();
-	
-	while (!gameOver) {
-		frameCount++;
-		
-		jugador->move();
-		jugador->disparar(disparos);
-		
-		for (auto disparo : disparos) disparo->move();
-		for (auto enemigo : enemigos) enemigo->move();
-		
-		spawnEnemigos();
-		
-		colisionesEnemigos();
-		
-		jugador->dibujar();
-		for (auto disparo : disparos) disparo->dibujar();
-		for (auto enemigo : enemigos) enemigo->dibujar();
-		
-		mostrarStatus();
-		mostrarMensajes();
-		
-		Sleep(50);
-	}
-	
-	clrscr();
-	gotoxy (30, 10);
-	cout << "Juego Terminado";
-	gotoxy (30, 12);
-	cout << "Tu puntuación final es: " << jugador->getPuntaje();
-	gotoxy (25, 14);
-	cout << "Para salir presiona una tecla cualquiera, como Homero...";
-	
-	getch();
-	
-}
-
 //Este es el bucle principal del juego: se limpia la pantalla, se oculta el mouse, se dibuja el borde.
 //Se ejecuta el bucle mientras no sea GameOver. Se mueven objetos, se crean enemigos, se detecta colisiones, se dibujan los objetos, se espera 50ms para controlar la velocidad.
 //Se muetra la pantalla de fin del juego con la puntuacion obtenida
+//el destructor libera la memoria de los objetos como jugador, disparos, enemigos
 
-//---¿NO HACE FALTA UN CIN.FAIL EN EL JUEGO? O NO HACE FALTA?
 
 int main () {
 	Madre game;
@@ -437,3 +498,4 @@ int main () {
 	
 	return 0;
 }
+//en el main se crea la instancia del juego y lo ejecuta
